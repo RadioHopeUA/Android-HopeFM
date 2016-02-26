@@ -6,7 +6,22 @@
     android:orientation="vertical"
     android:gravity="center"
     android:background="@drawable/bg">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAllCaps="true"
+        android:textColor="@color/colorAccent"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:text="Artist name"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorAccent"
+        android:textSize="24sp"
+        android:text="Song name"/>
     <ImageButton
+        android:layout_marginTop="50dp"
         android:id="@+id/buttonPlayPause"
         android:layout_width="96dp"
         android:layout_height="96dp"
