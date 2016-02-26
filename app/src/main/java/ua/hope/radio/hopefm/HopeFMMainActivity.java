@@ -24,14 +24,16 @@ public class HopeFMMainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ImageButton playPauseButton = (ImageButton) findViewById(R.id.buttonPlayPause);
+        final ImageButton playPauseButton = (ImageButton) findViewById(R.id.buttonPlayPause);
         playPauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (musicBound) {
                     if (musicSrv.isPlaying()) {
+                        playPauseButton.setImageResource(R.drawable.pause_button);
                         musicSrv.pause();
                     } else {
+                        playPauseButton.setImageResource(R.drawable.play_button);
                         musicSrv.play();
                     }
                 }
