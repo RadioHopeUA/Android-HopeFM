@@ -52,10 +52,10 @@ public class HopeFMService extends Service implements MediaPlayer.OnBufferingUpd
 
             try {
                 mPlayer.setDataSource(getString(R.string.radio_stream_url));
-                mPlayer.prepareAsync();
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            mPlayer.prepareAsync();
         } else {
             mPlayer.reset();
         }

@@ -1,33 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center"
-    android:background="@drawable/bg">
-    <TextView
-        android:layout_width="wrap_content"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@drawable/bg"
+              android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/audio_controls"
+            style="@style/DemoButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="showAudioPopup"
+            android:layout_gravity="end"
+            android:text="@string/audio"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAllCaps="true"
-        android:textColor="@color/colorAccent"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:text="Artist name"/>
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@color/colorAccent"
-        android:textSize="24sp"
-        android:text="Song name"/>
-    <ImageButton
-        android:layout_marginTop="50dp"
-        android:id="@+id/buttonPlayPause"
-        android:layout_width="96dp"
-        android:layout_height="96dp"
-        android:adjustViewBounds="true"
-        android:scaleType="fitXY"
-        app:srcCompat="@drawable/play_button"
-        android:background="#00000000"
-        />
+        android:gravity="center"
+        android:orientation="vertical"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Artist name"
+            android:textAllCaps="true"
+            android:textColor="@color/colorAccent"
+            android:textSize="24sp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Song name"
+            android:textColor="@color/colorAccent"
+            android:textSize="24sp"/>
+
+        <ImageButton
+            android:id="@+id/buttonPlayPause"
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:layout_marginTop="50dp"
+            android:adjustViewBounds="true"
+            android:background="#00000000"
+            android:scaleType="fitXY"
+            app:srcCompat="@drawable/pause_button"
+            />
+
+        <TextView
+            android:layout_marginTop="10dp"
+            android:id="@+id/textStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            />
+    </LinearLayout>
 </LinearLayout>
