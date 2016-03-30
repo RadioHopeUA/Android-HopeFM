@@ -1,14 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:background="@drawable/bg"
-              android:orientation="vertical">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg"
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="40dp"
+        android:background="@color/colorPrimaryDark"
+        android:padding="10dp">
+
+        <Button
+            android:id="@+id/www"
+            style="@style/DemoButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="WWW" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="Радіо"
+            android:textAllCaps="true"
+            android:textSize="20sp" />
 
         <Button
             android:id="@+id/audio_controls"
@@ -16,32 +35,30 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="showAudioPopup"
-            android:layout_gravity="end"
-            android:text="@string/audio"/>
+            android:text="@string/audio" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:orientation="vertical"
-        >
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Artist name"
-            android:textAllCaps="true"
-            android:textColor="@color/colorAccent"
-            android:textSize="24sp"
-            android:textStyle="bold"/>
+        android:orientation="vertical">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Song name"
+            android:textAllCaps="true"
             android:textColor="@color/colorAccent"
-            android:textSize="24sp"/>
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Artist name"
+            android:textColor="@color/colorAccent"
+            android:textSize="24sp" />
 
         <ImageButton
             android:id="@+id/buttonPlayPause"
@@ -51,14 +68,25 @@
             android:adjustViewBounds="true"
             android:background="#00000000"
             android:scaleType="fitXY"
-            app:srcCompat="@drawable/pause_button"
-            />
+            app:srcCompat="@drawable/pause_button" />
 
         <TextView
-            android:layout_marginTop="10dp"
             android:id="@+id/textStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            />
+            android:layout_marginTop="10dp" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:gravity="center"
+            android:text="© 2016 Hope Media Group Ukraine"
+            android:textColor="@color/colorAccent" />
     </LinearLayout>
 </LinearLayout>
