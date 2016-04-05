@@ -2,6 +2,7 @@ package ua.hope.radio.hopefm;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -34,6 +35,11 @@ import java.net.CookieManager;
 import java.net.CookiePolicy;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
+import android.os.Handler;
 
 /**
  * Created by Vitalii Cherniak on 12.01.16.
@@ -47,6 +53,7 @@ public class HopeFMMainActivity extends AppCompatActivity implements View.OnClic
     private static final int MENU_GROUP_TRACKS = 1;
 
     private static final CookieManager defaultCookieManager;
+
     static {
         defaultCookieManager = new CookieManager();
         defaultCookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ORIGINAL_SERVER);
@@ -56,6 +63,8 @@ public class HopeFMMainActivity extends AppCompatActivity implements View.OnClic
     private Button audioButton;
     private ImageButton playButton;
     private TextView statusText;
+    private TextView songNameText;
+    private TextView artistNameText;
 
     private HopeFMPlayer player;
     private boolean playerNeedsPrepare;
@@ -63,6 +72,21 @@ public class HopeFMMainActivity extends AppCompatActivity implements View.OnClic
     private long playerPosition;
 
     private AudioCapabilitiesReceiver audioCapabilitiesReceiver;
+
+    private Handler mCurrentTrackHandler = new Handler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(Message msg) {
+            String resp = msg.obj.toString();
+            String[] splitted = resp.split(" - ");
+            if (splitted.length == 2) {
+                artistNameText.setText(splitted[0]);
+                songNameText.setText(splitted[1]);
+            }
+            return true;
+        }
+    });
+
+    private ScheduledFuture mScheduledTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +96,8 @@ public class HopeFMMainActivity extends AppCompatActivity implements View.OnClic
         playButton = (ImageButton) findViewById(R.id.buttonPlayPause);
         playButton.setOnClickListener(this);
         statusText = (TextView) findViewById(R.id.textStatus);
+        songNameText = (TextView) findViewById(R.id.textSongName);
+        artistNameText = (TextView) findViewById(R.id.textArtistName);
 
         CookieHandler currentHandler = CookieHandler.getDefault();
         if (currentHandler != defaultCookieManager) {
@@ -80,7 +106,12 @@ public class HopeFMMainActivity extends AppCompatActivity implements View.OnClic
 
         audioCapabilitiesReceiver = new AudioCapabilitiesReceiver(this, this);
         audioCapabilitiesReceiver.register();
+        UpdateTrackRunnable updateTrackRunnable = new UpdateTrackRunnable(mCurrentTrackHandler, getString(R.string.radio_info_url));
+        ScheduledThreadPoolExecutor exec = new ScheduledThreadPoolExecutor(1);
+        mScheduledTask = exec.scheduleAtFixedRate(updateTrackRunnable, 0, 5, TimeUnit.SECONDS);
     }
+
+
 
     @Override
     public void onNewIntent(Intent intent) {
@@ -93,17 +124,13 @@ public class HopeFMMainActivity extends AppCompatActivity implements View.OnClic
     public void onResume() {
         super.onResume();
         if (player == null) {
-                preparePlayer(true);
-        } else {
-            player.setBackgrounded(false);
+            preparePlayer(true);
         }
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        player.setBackgrounded(true);
-
     }
 
     @Override
@@ -111,6 +138,7 @@ public class HopeFMMainActivity extends AppCompatActivity implements View.OnClic
         super.onDestroy();
         audioCapabilitiesReceiver.unregister();
         releasePlayer();
+        mScheduledTask.cancel(true);
     }
 
     // AudioCapabilitiesReceiver.Listener methods
@@ -154,6 +182,7 @@ public class HopeFMMainActivity extends AppCompatActivity implements View.OnClic
             updateButtonVisibilities();
         }
         player.setPlayWhenReady(playWhenReady);
+        player.setBackgrounded(true);
     }
 
     private void releasePlayer() {
@@ -171,7 +200,7 @@ public class HopeFMMainActivity extends AppCompatActivity implements View.OnClic
     @Override
     public void onStateChanged(boolean playWhenReady, int playbackState) {
         String text;
-        switch(playbackState) {
+        switch (playbackState) {
             case ExoPlayer.STATE_BUFFERING:
                 text = "buffering";
                 break;
