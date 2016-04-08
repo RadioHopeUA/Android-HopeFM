@@ -87,6 +87,8 @@ public class HopeFMMainActivity extends AppCompatActivity implements View.OnClic
     });
 
     private ScheduledFuture mScheduledTask;
+    private UpdateTrackRunnable updateTrackRunnable;
+    private ScheduledThreadPoolExecutor exec;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,12 +108,20 @@ public class HopeFMMainActivity extends AppCompatActivity implements View.OnClic
 
         audioCapabilitiesReceiver = new AudioCapabilitiesReceiver(this, this);
         audioCapabilitiesReceiver.register();
-        UpdateTrackRunnable updateTrackRunnable = new UpdateTrackRunnable(mCurrentTrackHandler, getString(R.string.radio_info_url));
-        ScheduledThreadPoolExecutor exec = new ScheduledThreadPoolExecutor(1);
+        updateTrackRunnable = new UpdateTrackRunnable(mCurrentTrackHandler, getString(R.string.radio_info_url));
+        exec = new ScheduledThreadPoolExecutor(1);
+        startTrackInfoScheduler();
+    }
+
+    private void startTrackInfoScheduler() {
         mScheduledTask = exec.scheduleAtFixedRate(updateTrackRunnable, 0, 5, TimeUnit.SECONDS);
     }
 
-
+    private void stopTrackInfoScheduler() {
+        mScheduledTask.cancel(true);
+        exec.remove(updateTrackRunnable);
+        exec.purge();
+    }
 
     @Override
     public void onNewIntent(Intent intent) {
@@ -138,7 +148,7 @@ public class HopeFMMainActivity extends AppCompatActivity implements View.OnClic
         super.onDestroy();
         audioCapabilitiesReceiver.unregister();
         releasePlayer();
-        mScheduledTask.cancel(true);
+        stopTrackInfoScheduler();
     }
 
     // AudioCapabilitiesReceiver.Listener methods
@@ -148,11 +158,9 @@ public class HopeFMMainActivity extends AppCompatActivity implements View.OnClic
         if (player == null) {
             return;
         }
-        boolean backgrounded = player.getBackgrounded();
         boolean playWhenReady = player.getPlayWhenReady();
         releasePlayer();
         preparePlayer(playWhenReady);
-        player.setBackgrounded(backgrounded);
     }
 
     // Internal methods
@@ -182,7 +190,6 @@ public class HopeFMMainActivity extends AppCompatActivity implements View.OnClic
             updateButtonVisibilities();
         }
         player.setPlayWhenReady(playWhenReady);
-        player.setBackgrounded(true);
     }
 
     private void releasePlayer() {
@@ -388,9 +395,11 @@ public class HopeFMMainActivity extends AppCompatActivity implements View.OnClic
             if (player.getPlayerControl().isPlaying()) {
                 player.getPlayerControl().pause();
                 playButton.setImageResource(R.drawable.play_button);
+                stopTrackInfoScheduler();
             } else {
                 preparePlayer(true);
                 playButton.setImageResource(R.drawable.pause_button);
+                startTrackInfoScheduler();
             }
         }
     }

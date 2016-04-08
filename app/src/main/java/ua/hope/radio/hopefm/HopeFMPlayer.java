@@ -172,14 +172,11 @@ public class HopeFMPlayer implements ExoPlayer.Listener, ChunkSampleSource.Event
   private int lastReportedPlaybackState;
   private boolean lastReportedPlayWhenReady;
 
-  private Surface surface;
   private TrackRenderer videoRenderer;
   private CodecCounters codecCounters;
   private Format videoFormat;
-  private int videoTrackToRestore;
 
   private BandwidthMeter bandwidthMeter;
-  private boolean backgrounded;
 
   private CaptionListener captionListener;
   private Id3MetadataListener id3MetadataListener;
@@ -197,6 +194,8 @@ public class HopeFMPlayer implements ExoPlayer.Listener, ChunkSampleSource.Event
     rendererBuildingState = RENDERER_BUILDING_STATE_IDLE;
     // Disable text initially.
     player.setSelectedTrack(TYPE_TEXT, TRACK_DISABLED);
+    // Disable video initially.
+    setSelectedTrack(TYPE_VIDEO, TRACK_DISABLED);
   }
 
   public PlayerControl getPlayerControl() {
@@ -227,20 +226,6 @@ public class HopeFMPlayer implements ExoPlayer.Listener, ChunkSampleSource.Event
     id3MetadataListener = listener;
   }
 
-  public void setSurface(Surface surface) {
-    this.surface = surface;
-    pushSurface(false);
-  }
-
-  public Surface getSurface() {
-    return surface;
-  }
-
-  public void blockingClearSurface() {
-    surface = null;
-    pushSurface(true);
-  }
-
   public int getTrackCount(int type) {
     return player.getTrackCount(type);
   }
@@ -257,24 +242,6 @@ public class HopeFMPlayer implements ExoPlayer.Listener, ChunkSampleSource.Event
     player.setSelectedTrack(type, index);
     if (type == TYPE_TEXT && index < 0 && captionListener != null) {
       captionListener.onCues(Collections.<Cue>emptyList());
-    }
-  }
-
-  public boolean getBackgrounded() {
-    return backgrounded;
-  }
-
-  public void setBackgrounded(boolean backgrounded) {
-    if (this.backgrounded == backgrounded) {
-      return;
-    }
-    this.backgrounded = backgrounded;
-    if (backgrounded) {
-      videoTrackToRestore = getSelectedTrack(TYPE_VIDEO);
-      setSelectedTrack(TYPE_VIDEO, TRACK_DISABLED);
-      blockingClearSurface();
-    } else {
-      setSelectedTrack(TYPE_VIDEO, videoTrackToRestore);
     }
   }
 
@@ -311,7 +278,6 @@ public class HopeFMPlayer implements ExoPlayer.Listener, ChunkSampleSource.Event
         : renderers[TYPE_AUDIO] instanceof MediaCodecTrackRenderer
         ? ((MediaCodecTrackRenderer) renderers[TYPE_AUDIO]).codecCounters : null;
     this.bandwidthMeter = bandwidthMeter;
-    pushSurface(false);
     player.prepare(renderers);
     rendererBuildingState = RENDERER_BUILDING_STATE_BUILT;
   }
@@ -343,7 +309,6 @@ public class HopeFMPlayer implements ExoPlayer.Listener, ChunkSampleSource.Event
   public void release() {
     rendererBuilder.cancel();
     rendererBuildingState = RENDERER_BUILDING_STATE_IDLE;
-    surface = null;
     player.release();
   }
 
@@ -581,19 +546,4 @@ public class HopeFMPlayer implements ExoPlayer.Listener, ChunkSampleSource.Event
       lastReportedPlaybackState = playbackState;
     }
   }
-
-  private void pushSurface(boolean blockForSurfacePush) {
-    if (videoRenderer == null) {
-      return;
-    }
-
-    if (blockForSurfacePush) {
-      player.blockingSendMessage(
-          videoRenderer, MediaCodecVideoTrackRenderer.MSG_SET_SURFACE, surface);
-    } else {
-      player.sendMessage(
-          videoRenderer, MediaCodecVideoTrackRenderer.MSG_SET_SURFACE, surface);
-    }
-  }
-
 }
