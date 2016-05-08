@@ -70,7 +70,7 @@
             android:adjustViewBounds="true"
             android:background="#00000000"
             android:scaleType="fitXY"
-            app:srcCompat="@drawable/pause_button" />
+            app:srcCompat="@drawable/play_button" />
 
         <TextView
             android:id="@+id/textStatus"
