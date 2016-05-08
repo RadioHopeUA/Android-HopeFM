@@ -70,6 +70,10 @@ public class HopeFMMainActivity extends AppCompatActivity implements View.OnClic
     @SuppressWarnings("unused")
     public void onStatusInfoReceived(StatusInfoEvent event) {
         if (statusText != null) {
+            if (event.status.equals("error")) {
+                mHopeFMService.stop();
+                setOnPauseButtons();
+            }
             statusText.setText(event.status);
         }
     }
@@ -205,13 +209,21 @@ public class HopeFMMainActivity extends AppCompatActivity implements View.OnClic
     private void updateAudioButtonState() {
         if (playButton != null && audioButton != null) {
             if (mHopeFMService.isPlaying()) {
-                playButton.setImageResource(R.drawable.pause_button);
-                audioButton.setVisibility(View.VISIBLE);
+                setOnPlayButtons();
             } else {
-                playButton.setImageResource(R.drawable.play_button);
-                audioButton.setVisibility(View.INVISIBLE);
+                setOnPauseButtons();
             }
         }
+    }
+
+    private void setOnPauseButtons() {
+        playButton.setImageResource(R.drawable.play_button);
+        audioButton.setVisibility(View.INVISIBLE);
+    }
+
+    private void setOnPlayButtons() {
+        playButton.setImageResource(R.drawable.pause_button);
+        audioButton.setVisibility(View.VISIBLE);
     }
 
     private ServiceConnection mConnection = new ServiceConnection() {

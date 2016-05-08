@@ -246,8 +246,7 @@ public class HopeFMService extends Service implements HopeFMPlayer.Listener, Hop
             Toast.makeText(getApplicationContext(), errorString, Toast.LENGTH_LONG).show();
         }
         playerNeedsPrepare = true;
-        //TODO: send update to UI
-//        updateButtonVisibilities();
+        EventBus.getDefault().post(new StatusInfoEvent("error"));
     }
 
     @Override

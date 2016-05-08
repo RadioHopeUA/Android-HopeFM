@@ -26,6 +26,8 @@ import com.google.android.exoplayer.audio.AudioTrack;
 import com.google.android.exoplayer.chunk.Format;
 import com.google.android.exoplayer.util.VerboseLogUtil;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -72,6 +74,7 @@ public class EventLogger implements HopeFMPlayer.Listener, HopeFMPlayer.InfoList
   @Override
   public void onError(Exception e) {
     Log.e(TAG, "playerFailed [" + getSessionTimeString() + "]", e);
+    EventBus.getDefault().post(new StatusInfoEvent("error"));
   }
 
   @Override
