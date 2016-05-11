@@ -173,7 +173,7 @@ public class HopeFMMainActivity extends AppCompatActivity implements View.OnClic
         }
     };
 
-    private Handler mHandler = new Handler(new Handler.Callback(){
+    private Handler mHandler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(Message msg) {
             switch (msg.what) {
@@ -186,6 +186,10 @@ public class HopeFMMainActivity extends AppCompatActivity implements View.OnClic
                     if ("error".equals(status)) {
                         mHopeFMService.stop();
                         setOnPauseButtons();
+                    }
+                    if ("stopped".equals(status)) {
+                        setOnPauseButtons();
+                        break;
                     }
                     statusText.setText(status);
                     break;

@@ -1,5 +1,6 @@
 package ua.hope.radio.hopefm;
 
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
@@ -7,6 +8,8 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
@@ -50,6 +53,8 @@ public class HopeFMService extends Service implements HopeFMPlayer.Listener, Hop
             String resp = msg.obj.toString();
             String[] splitted = resp.split(" - ");
             if (splitted.length == 2) {
+                mBuilder.setContentText(splitted[0]).setContentTitle(splitted[1]);
+                mNotifyManager.notify(NOTIFICATION_ID, mBuilder.build());
                 if (callback != null) {
                     callback.updateSongInfo(splitted[0], splitted[1]);
                 }
@@ -66,6 +71,9 @@ public class HopeFMService extends Service implements HopeFMPlayer.Listener, Hop
 
     private ArrayList<String> tracks = new ArrayList<>();
     private IHopeFMServiceCallback callback;
+    private NotificationManagerCompat mNotifyManager;
+    private NotificationCompat.Builder mBuilder;
+    private static final int NOTIFICATION_ID = 1;
 
     @Nullable
     @Override
@@ -85,6 +93,27 @@ public class HopeFMService extends Service implements HopeFMPlayer.Listener, Hop
         audioCapabilitiesReceiver.register();
         updateTrackRunnable = new UpdateTrackRunnable(mCurrentTrackHandler, getString(R.string.radio_info_url));
         exec = new ScheduledThreadPoolExecutor(1);
+
+        mNotifyManager = NotificationManagerCompat.from(this);
+        Intent notificationIntent = new Intent(this, HopeFMMainActivity.class);
+        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+
+        NotificationCompat.Action action = new NotificationCompat.Action(R.mipmap.ic_launcher,
+                "Stop", PendingIntent.getService(this, 0, new Intent(this, HopeFMService.class).setAction("stop"), PendingIntent.FLAG_UPDATE_CURRENT));
+        mBuilder = new NotificationCompat.Builder(this)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentIntent(pendingIntent)
+                .addAction(action);
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        if ("stop".equals(intent.getAction())) {
+            stop();
+        }
+        return super.onStartCommand(intent, flags, startId);
     }
 
     @Override
@@ -108,6 +137,7 @@ public class HopeFMService extends Service implements HopeFMPlayer.Listener, Hop
     public void play() {
         preparePlayer(true);
         startTrackInfoScheduler();
+        startForeground(NOTIFICATION_ID, mBuilder.build());
     }
 
     @Override
@@ -115,6 +145,10 @@ public class HopeFMService extends Service implements HopeFMPlayer.Listener, Hop
         tracks.clear();
         releasePlayer();
         stopTrackInfoScheduler();
+        stopForeground(true);
+        if (callback != null) {
+            callback.updateStatus("stopped");
+        }
     }
 
     @Override
@@ -139,7 +173,7 @@ public class HopeFMService extends Service implements HopeFMPlayer.Listener, Hop
     }
 
     public int getTrackCount() {
-        if (player ==null) {
+        if (player == null) {
             return 0;
         } else {
             return player.getTrackCount(HopeFMPlayer.TYPE_AUDIO);
@@ -224,7 +258,7 @@ public class HopeFMService extends Service implements HopeFMPlayer.Listener, Hop
                 break;
             case ExoPlayer.STATE_READY:
                 tracks.clear();
-                for (int i=0; i<getTrackCount(); i++) {
+                for (int i = 0; i < getTrackCount(); i++) {
                     tracks.add(buildTrackName(getTrackFormat(i)));
                 }
                 if (callback != null) {

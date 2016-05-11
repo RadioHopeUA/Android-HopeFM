@@ -11,7 +11,10 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".HopeFMMainActivity">
+        <activity
+            android:launchMode="singleTask"
+            android:taskAffinity=""
+            android:name=".HopeFMMainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
