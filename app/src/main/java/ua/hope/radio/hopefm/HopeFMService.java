@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -22,11 +23,12 @@ import com.google.android.exoplayer.metadata.id3.GeobFrame;
 import com.google.android.exoplayer.metadata.id3.Id3Frame;
 import com.google.android.exoplayer.metadata.id3.PrivFrame;
 import com.google.android.exoplayer.metadata.id3.TxxxFrame;
+import com.google.android.exoplayer.util.MimeTypes;
 import com.google.android.exoplayer.util.Util;
 
-import org.greenrobot.eventbus.EventBus;
-
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -36,7 +38,7 @@ import java.util.concurrent.TimeUnit;
  * Copyright © 2016 Hope Media Group Ukraine. All rights reserved.
  */
 public class HopeFMService extends Service implements HopeFMPlayer.Listener, HopeFMPlayer.Id3MetadataListener,
-        AudioCapabilitiesReceiver.Listener {
+        AudioCapabilitiesReceiver.Listener, IHopeFMService {
     private static final String TAG = "HopeFMService";
     private final IBinder musicBind = new MusicBinder();
     private ScheduledFuture mScheduledTask;
@@ -48,7 +50,9 @@ public class HopeFMService extends Service implements HopeFMPlayer.Listener, Hop
             String resp = msg.obj.toString();
             String[] splitted = resp.split(" - ");
             if (splitted.length == 2) {
-                EventBus.getDefault().post(new TrackInfoEvent(splitted[1], splitted[0]));
+                if (callback != null) {
+                    callback.updateSongInfo(splitted[0], splitted[1]);
+                }
             }
             return true;
         }
@@ -59,6 +63,9 @@ public class HopeFMService extends Service implements HopeFMPlayer.Listener, Hop
     private EventLogger eventLogger;
 
     private AudioCapabilitiesReceiver audioCapabilitiesReceiver;
+
+    private ArrayList<String> tracks = new ArrayList<>();
+    private IHopeFMServiceCallback callback;
 
     @Nullable
     @Override
@@ -84,8 +91,7 @@ public class HopeFMService extends Service implements HopeFMPlayer.Listener, Hop
     public void onDestroy() {
         super.onDestroy();
         audioCapabilitiesReceiver.unregister();
-        releasePlayer();
-        stopTrackInfoScheduler();
+        stop();
     }
 
     private void startTrackInfoScheduler() {
@@ -98,30 +104,32 @@ public class HopeFMService extends Service implements HopeFMPlayer.Listener, Hop
         exec.purge();
     }
 
+    @Override
     public void play() {
         preparePlayer(true);
         startTrackInfoScheduler();
     }
 
+    @Override
     public void stop() {
+        tracks.clear();
         releasePlayer();
         stopTrackInfoScheduler();
     }
 
+    @Override
     public boolean isPlaying() {
         return player != null && player.getPlayerControl().isPlaying();
     }
 
-    public boolean haveTracks() {
-        return player != null && player.getTrackCount(HopeFMPlayer.TYPE_AUDIO) > 0;
-    }
-
+    @Override
     public void setSelectedTrack(int id) {
         if (player != null) {
             player.setSelectedTrack(HopeFMPlayer.TYPE_AUDIO, id);
         }
     }
 
+    @Override
     public int getSelectedTrack() {
         if (player == null) {
             return 0;
@@ -143,6 +151,15 @@ public class HopeFMService extends Service implements HopeFMPlayer.Listener, Hop
             return null;
         } else {
             return player.getTrackFormat(HopeFMPlayer.TYPE_AUDIO, id);
+        }
+    }
+
+    @Override
+    public void registerCallback(IHopeFMServiceCallback callback) {
+        this.callback = callback;
+        //update UI
+        if (callback != null) {
+            callback.updateTracks(tracks, getSelectedTrack());
         }
     }
 
@@ -181,7 +198,6 @@ public class HopeFMService extends Service implements HopeFMPlayer.Listener, Hop
         if (playerNeedsPrepare) {
             player.prepare();
             playerNeedsPrepare = false;
-//            updateButtonVisibilities();
         }
         player.setPlayWhenReady(playWhenReady);
     }
@@ -198,7 +214,7 @@ public class HopeFMService extends Service implements HopeFMPlayer.Listener, Hop
     // HopeFMPlayer.Listener implementation
     @Override
     public void onStateChanged(boolean playWhenReady, int playbackState) {
-        String text;
+        String text = "";
         switch (playbackState) {
             case ExoPlayer.STATE_BUFFERING:
                 text = "buffering";
@@ -206,11 +222,22 @@ public class HopeFMService extends Service implements HopeFMPlayer.Listener, Hop
             case ExoPlayer.STATE_PREPARING:
                 text = "preparing";
                 break;
+            case ExoPlayer.STATE_READY:
+                tracks.clear();
+                for (int i=0; i<getTrackCount(); i++) {
+                    tracks.add(buildTrackName(getTrackFormat(i)));
+                }
+                if (callback != null) {
+                    callback.updateTracks(tracks, getSelectedTrack());
+                }
+                break;
             default:
                 text = "";
                 break;
         }
-        EventBus.getDefault().post(new StatusInfoEvent(text));
+        if (callback != null) {
+            callback.updateStatus(text);
+        }
     }
 
     @Override
@@ -246,7 +273,9 @@ public class HopeFMService extends Service implements HopeFMPlayer.Listener, Hop
             Toast.makeText(getApplicationContext(), errorString, Toast.LENGTH_LONG).show();
         }
         playerNeedsPrepare = true;
-        EventBus.getDefault().post(new StatusInfoEvent("error"));
+        if (callback != null) {
+            callback.updateStatus("error");
+        }
     }
 
     @Override
@@ -273,6 +302,53 @@ public class HopeFMService extends Service implements HopeFMPlayer.Listener, Hop
                 Log.i(TAG, String.format("ID3 TimedMetadata %s", id3Frame.id));
             }
         }
+    }
+
+    private static String buildTrackName(MediaFormat format) {
+        if (format.adaptive) {
+            return "auto";
+        }
+        String trackName;
+        if (MimeTypes.isVideo(format.mimeType)) {
+            trackName = joinWithSeparator(joinWithSeparator(buildResolutionString(format),
+                    buildBitrateString(format)), buildTrackIdString(format));
+        } else if (MimeTypes.isAudio(format.mimeType)) {
+            trackName = joinWithSeparator(joinWithSeparator(joinWithSeparator(buildLanguageString(format),
+                    buildAudioPropertyString(format)), buildBitrateString(format)),
+                    buildTrackIdString(format));
+        } else {
+            trackName = joinWithSeparator(joinWithSeparator(buildLanguageString(format),
+                    buildBitrateString(format)), buildTrackIdString(format));
+        }
+        return trackName.length() == 0 ? "unknown" : trackName;
+    }
+
+    private static String buildResolutionString(MediaFormat format) {
+        return format.width == MediaFormat.NO_VALUE || format.height == MediaFormat.NO_VALUE
+                ? "" : format.width + "x" + format.height;
+    }
+
+    private static String buildAudioPropertyString(MediaFormat format) {
+        return format.channelCount == MediaFormat.NO_VALUE || format.sampleRate == MediaFormat.NO_VALUE
+                ? "" : format.channelCount + "ch, " + format.sampleRate + "Hz";
+    }
+
+    private static String buildLanguageString(MediaFormat format) {
+        return TextUtils.isEmpty(format.language) || "und".equals(format.language) ? ""
+                : format.language;
+    }
+
+    private static String buildBitrateString(MediaFormat format) {
+        return format.bitrate == MediaFormat.NO_VALUE ? ""
+                : String.format(Locale.US, "%.2fMbit", format.bitrate / 1000000f);
+    }
+
+    private static String joinWithSeparator(String first, String second) {
+        return first.length() == 0 ? second : (second.length() == 0 ? first : first + ", " + second);
+    }
+
+    private static String buildTrackIdString(MediaFormat format) {
+        return format.trackId == null ? "" : " (" + format.trackId + ")";
     }
 
     public class MusicBinder extends Binder {

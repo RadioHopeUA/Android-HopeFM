@@ -34,9 +34,6 @@ import com.google.android.exoplayer.util.ManifestFetcher;
 import java.io.IOException;
 import java.util.List;
 
-/**
- * Created by Vitalii on 28.03.2016.
- */
 public class HlsRendererBuilder implements HopeFMPlayer.RendererBuilder {
 
     private static final int BUFFER_SEGMENT_SIZE = 64 * 1024;
@@ -74,7 +71,6 @@ public class HlsRendererBuilder implements HopeFMPlayer.RendererBuilder {
 
         private final Context context;
         private final String userAgent;
-        private final String url;
         private final HopeFMPlayer player;
         private final ManifestFetcher<HlsPlaylist> playlistFetcher;
 
@@ -83,7 +79,6 @@ public class HlsRendererBuilder implements HopeFMPlayer.RendererBuilder {
         public AsyncRendererBuilder(Context context, String userAgent, String url, HopeFMPlayer player) {
             this.context = context;
             this.userAgent = userAgent;
-            this.url = url;
             this.player = player;
             HlsPlaylistParser parser = new HlsPlaylistParser();
             playlistFetcher = new ManifestFetcher<>(url, new DefaultUriDataSource(context, userAgent),
@@ -128,7 +123,7 @@ public class HlsRendererBuilder implements HopeFMPlayer.RendererBuilder {
 
             // Build the video/id3 renderers.
             DataSource dataSource = new DefaultUriDataSource(context, bandwidthMeter, userAgent);
-            HlsChunkSource chunkSource = new HlsChunkSource(true /* isMaster */, dataSource, url,
+            HlsChunkSource chunkSource = new HlsChunkSource(true /* isMaster */, dataSource,
                     manifest, DefaultHlsTrackSelector.newDefaultInstance(context), bandwidthMeter,
                     timestampAdjusterProvider, HlsChunkSource.ADAPTIVE_MODE_SPLICE);
             HlsSampleSource sampleSource = new HlsSampleSource(chunkSource, loadControl,
@@ -144,7 +139,7 @@ public class HlsRendererBuilder implements HopeFMPlayer.RendererBuilder {
             if (haveAudios) {
                 DataSource audioDataSource = new DefaultUriDataSource(context, bandwidthMeter, userAgent);
                 HlsChunkSource audioChunkSource = new HlsChunkSource(false /* isMaster */, audioDataSource,
-                        url, manifest, DefaultHlsTrackSelector.newAudioInstance(), bandwidthMeter,
+                        manifest, DefaultHlsTrackSelector.newAudioInstance(), bandwidthMeter,
                         timestampAdjusterProvider, HlsChunkSource.ADAPTIVE_MODE_SPLICE);
                 HlsSampleSource audioSampleSource = new HlsSampleSource(audioChunkSource, loadControl,
                         AUDIO_BUFFER_SEGMENTS * BUFFER_SEGMENT_SIZE, mainHandler, player,
@@ -164,7 +159,7 @@ public class HlsRendererBuilder implements HopeFMPlayer.RendererBuilder {
             if (haveSubtitles) {
                 DataSource textDataSource = new DefaultUriDataSource(context, bandwidthMeter, userAgent);
                 HlsChunkSource textChunkSource = new HlsChunkSource(false /* isMaster */, textDataSource,
-                        url, manifest, DefaultHlsTrackSelector.newSubtitleInstance(), bandwidthMeter,
+                        manifest, DefaultHlsTrackSelector.newSubtitleInstance(), bandwidthMeter,
                         timestampAdjusterProvider, HlsChunkSource.ADAPTIVE_MODE_SPLICE);
                 HlsSampleSource textSampleSource = new HlsSampleSource(textChunkSource, loadControl,
                         TEXT_BUFFER_SEGMENTS * BUFFER_SEGMENT_SIZE, mainHandler, player, HopeFMPlayer.TYPE_TEXT);
