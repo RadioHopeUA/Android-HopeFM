@@ -191,6 +191,10 @@ public class HopeFMMainActivity extends AppCompatActivity implements View.OnClic
                         setOnPauseButtons();
                         break;
                     }
+                    if ("playing".equals(status)) {
+                        setOnPlayButtons();
+                        break;
+                    }
                     statusText.setText(status);
                     break;
                 case TRACKS_MSG:

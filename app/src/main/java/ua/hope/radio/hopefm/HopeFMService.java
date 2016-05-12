@@ -3,6 +3,7 @@ package ua.hope.radio.hopefm;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
@@ -41,7 +42,7 @@ import java.util.concurrent.TimeUnit;
  * Copyright © 2016 Hope Media Group Ukraine. All rights reserved.
  */
 public class HopeFMService extends Service implements HopeFMPlayer.Listener, HopeFMPlayer.Id3MetadataListener,
-        AudioCapabilitiesReceiver.Listener, IHopeFMService {
+        AudioCapabilitiesReceiver.Listener, IHopeFMService, AudioManager.OnAudioFocusChangeListener {
     private static final String TAG = "HopeFMService";
     private final IBinder musicBind = new MusicBinder();
     private ScheduledFuture mScheduledTask;
@@ -68,6 +69,7 @@ public class HopeFMService extends Service implements HopeFMPlayer.Listener, Hop
     private EventLogger eventLogger;
 
     private AudioCapabilitiesReceiver audioCapabilitiesReceiver;
+    AudioManager am;
 
     private ArrayList<String> tracks = new ArrayList<>();
     private IHopeFMServiceCallback callback;
@@ -89,6 +91,7 @@ public class HopeFMService extends Service implements HopeFMPlayer.Listener, Hop
     @Override
     public void onCreate() {
         super.onCreate();
+        am = (AudioManager) getSystemService(AUDIO_SERVICE);
         audioCapabilitiesReceiver = new AudioCapabilitiesReceiver(this, this);
         audioCapabilitiesReceiver.register();
         updateTrackRunnable = new UpdateTrackRunnable(mCurrentTrackHandler, getString(R.string.radio_info_url));
@@ -122,6 +125,7 @@ public class HopeFMService extends Service implements HopeFMPlayer.Listener, Hop
         super.onDestroy();
         audioCapabilitiesReceiver.unregister();
         stop();
+        am.abandonAudioFocus(this);
     }
 
     private void startTrackInfoScheduler() {
@@ -136,9 +140,13 @@ public class HopeFMService extends Service implements HopeFMPlayer.Listener, Hop
 
     @Override
     public void play() {
+        am.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
         preparePlayer(true);
         startTrackInfoScheduler();
         startForeground(NOTIFICATION_ID, mBuilder.build());
+        if (callback != null) {
+            callback.updateStatus("playing");
+        }
     }
 
     @Override
@@ -384,6 +392,25 @@ public class HopeFMService extends Service implements HopeFMPlayer.Listener, Hop
 
     private static String buildTrackIdString(MediaFormat format) {
         return format.trackId == null ? "" : " (" + format.trackId + ")";
+    }
+
+    private boolean stoppedByAudioFocus = false;
+    @Override
+    public void onAudioFocusChange(int focusChange) {
+        if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
+            if (isPlaying()) {
+                stoppedByAudioFocus = true;
+                stop();
+            }
+        } else if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
+            if (stoppedByAudioFocus) {
+                play();
+                stoppedByAudioFocus = false;
+            }
+        } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
+            stop();
+            am.abandonAudioFocus(this);
+        }
     }
 
     public class MusicBinder extends Binder {
