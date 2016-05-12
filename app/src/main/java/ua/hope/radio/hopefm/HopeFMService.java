@@ -105,6 +105,7 @@ public class HopeFMService extends Service implements HopeFMPlayer.Listener, Hop
         mBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentIntent(pendingIntent)
+                .setShowWhen(false)
                 .addAction(action);
     }
 
