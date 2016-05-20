@@ -1,5 +1,6 @@
 package ua.hope.radio.hopefm;
 
+import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
@@ -13,6 +14,7 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.RemoteViews;
 import android.widget.Toast;
 
 import com.google.android.exoplayer.ExoPlaybackException;
@@ -54,8 +56,9 @@ public class HopeFMService extends Service implements HopeFMPlayer.Listener, Hop
             String resp = msg.obj.toString();
             String[] splitted = resp.split(" - ");
             if (splitted.length == 2) {
-                mBuilder.setContentText(splitted[0]).setContentTitle(splitted[1]);
-                mNotifyManager.notify(NOTIFICATION_ID, mBuilder.build());
+                mServiceNotification.contentView.setTextViewText(R.id.status_bar_artist_name, splitted[0]);
+                mServiceNotification.contentView.setTextViewText(R.id.status_bar_track_name, splitted[1]);
+                mNotifyManager.notify(NOTIFICATION_ID, mServiceNotification);
                 if (callback != null) {
                     callback.updateSongInfo(splitted[0], splitted[1]);
                 }
@@ -69,13 +72,13 @@ public class HopeFMService extends Service implements HopeFMPlayer.Listener, Hop
     private EventLogger eventLogger;
 
     private AudioCapabilitiesReceiver audioCapabilitiesReceiver;
-    AudioManager am;
+    private AudioManager am;
 
     private ArrayList<String> tracks = new ArrayList<>();
     private IHopeFMServiceCallback callback;
     private NotificationManagerCompat mNotifyManager;
-    private NotificationCompat.Builder mBuilder;
     private static final int NOTIFICATION_ID = 1;
+    private Notification mServiceNotification;
 
     @Nullable
     @Override
@@ -103,13 +106,14 @@ public class HopeFMService extends Service implements HopeFMPlayer.Listener, Hop
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
-        NotificationCompat.Action action = new NotificationCompat.Action(R.mipmap.ic_launcher,
-                "Stop", PendingIntent.getService(this, 0, new Intent(this, HopeFMService.class).setAction("stop"), PendingIntent.FLAG_UPDATE_CURRENT));
-        mBuilder = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentIntent(pendingIntent)
-                .setShowWhen(false)
-                .addAction(action);
+        PendingIntent stopPendingIntent = PendingIntent.getService(this, 0,
+                new Intent(this, HopeFMService.class).setAction("stop"), PendingIntent.FLAG_UPDATE_CURRENT);
+        RemoteViews views = new RemoteViews(getPackageName(), R.layout.status_bar);
+        views.setOnClickPendingIntent(R.id.status_bar_stop, stopPendingIntent);
+        mServiceNotification = new NotificationCompat.Builder(this)
+                .setContent(views)
+                .setSmallIcon(R.drawable.ic_stat_av_play_circle_outline)
+                .setContentIntent(pendingIntent).build();
     }
 
     @Override
@@ -143,7 +147,7 @@ public class HopeFMService extends Service implements HopeFMPlayer.Listener, Hop
         am.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
         preparePlayer(true);
         startTrackInfoScheduler();
-        startForeground(NOTIFICATION_ID, mBuilder.build());
+        startForeground(NOTIFICATION_ID, mServiceNotification);
         if (callback != null) {
             callback.updateStatus("playing");
         }

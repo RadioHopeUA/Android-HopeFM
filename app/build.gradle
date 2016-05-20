@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "24 rc3"
+    buildToolsVersion "24 rc4"
 
     defaultConfig {
         applicationId "ua.hope.radio.hopefm"
