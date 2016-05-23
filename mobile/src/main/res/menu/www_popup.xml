@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/website"
+        android:title="@string/web_page"
+        />
+    <item
+        android:id="@+id/fb"
+        android:title="@string/facebook"
+        />
+    <item
+        android:id="@+id/vk"
+        android:title="@string/vkontakte"
+        />
+    <item
+        android:id="@+id/twitter"
+        android:title="@string/twitter"
+        />
+    <item
+        android:id="@+id/write_us"
+        android:title="@string/write_us"
+        />
+</menu>

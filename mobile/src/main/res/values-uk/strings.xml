@@ -4,4 +4,14 @@
     <string name="radio_capture">Радіо</string>
     <string name="copyright_capture">© 2016 Медіа Група «Надія»</string>
     <string name="audio">Аудіо</string>
+    <string name="status_buffering">буферизація</string>
+    <string name="status_error">помилка</string>
+    <string name="status_preparing">ініціалізація</string>
+    <string name="youth_radio">Молодіжне радіо</string>
+    <string name="pleased_to_hear">Нас завжди приємно слухати…</string>
+    <string name="twitter">Твітер</string>
+    <string name="vkontakte">Вконтакті</string>
+    <string name="web_page">Веб сторінка</string>
+    <string name="write_us">Зворотній зв\'язок</string>
+    <string name="facebook">Фейсбук</string>
 </resources>

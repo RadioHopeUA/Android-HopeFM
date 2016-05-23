@@ -2,6 +2,11 @@
     <string name="app_name">Hope.FM</string>
     <string name="radio_stream_url" translatable="false">http://stream.hope.ua:1935/hopefm/ngrp:live/playlist.m3u8</string>
     <string name="radio_info_url" translatable="false">http://stream.hope.ua:7777/currentsong?sid=21</string>
+    <string name="website_url" translatable="false">http://radio.hope.ua</string>
+    <string name="fb_url" translatable="false">https://www.facebook.com/golosnadii</string>
+    <string name="twitter_url" translatable="false">https://twitter.com/golosnadii</string>
+    <string name="vk_url" translatable="false">https://vk.com/golosnadii</string>
+    <string name="mailto_url" translatable="false">mailto:chernyak.vitaliy@gmail.com</string>
 
     <string name="audio">Audio</string>
 
@@ -15,4 +20,19 @@
     <string name="storage_permission_denied" translatable="false">Permission to access storage was denied</string>
     <string name="copyright_capture">© 2016 Hope Media Group UA</string>
     <string name="radio_capture">Radio</string>
+    <string name="hopefm" translatable="false">
+        <![CDATA[
+        <b><font color="#646b6a">Hope.</font><font color="#2b5750">FM</font></b>
+        ]]>
+    </string>
+    <string name="status_buffering">buffering</string>
+    <string name="status_preparing">preparing</string>
+    <string name="status_error">error</string>
+    <string name="pleased_to_hear">We are always pleased to be heard…</string>
+    <string name="youth_radio">Youth radio</string>
+    <string name="web_page">Web page</string>
+    <string name="facebook">Facebook</string>
+    <string name="vkontakte">Vkontakte</string>
+    <string name="twitter">Twitter</string>
+    <string name="write_us">Write us</string>
 </resources>

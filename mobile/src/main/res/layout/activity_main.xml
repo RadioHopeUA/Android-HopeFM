@@ -16,8 +16,6 @@
         <Button
             android:id="@+id/www"
             style="@style/DemoButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:text="WWW" />
 
         <TextView
@@ -32,8 +30,6 @@
         <Button
             android:id="@+id/audio_controls"
             style="@style/DemoButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:onClick="showAudioPopup"
             android:text="@string/audio" />
     </LinearLayout>
@@ -83,10 +79,67 @@
             android:layout_height="0dp"
             android:layout_weight="1" />
 
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/hopeFMText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:text="Hope.FM"
+                android:textSize="28sp"
+                />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_centerVertical="true"
+                android:layout_toLeftOf="@id/hopeFMText"
+                android:background="@color/colorDivider"
+                />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@id/hopeFMText"
+                android:background="@color/colorDivider"
+                />
+        </RelativeLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/youth_radio"
+            android:textStyle="bold"
+            android:textAllCaps="true"
+            android:textSize="20sp"
+            android:layout_marginTop="20dp"
+            android:textColor="@color/colorText"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/pleased_to_hear"
+            android:textSize="20sp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="20dp"
+            android:textColor="@color/colorText"
+            />
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="20dp"
+            android:layout_marginTop="20dp"
             android:gravity="center"
             android:text="@string/copyright_capture"
             android:textColor="@color/colorAccent" />

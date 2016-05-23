@@ -4,11 +4,13 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Html;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,6 +30,7 @@ public class HopeFMMainActivity extends AppCompatActivity implements View.OnClic
     private static final int MENU_GROUP_TRACKS = 1;
 
     private Button audioButton;
+    private Button wwwButton;
     private ImageButton playButton;
     private TextView statusText;
     private TextView songNameText;
@@ -42,6 +45,56 @@ public class HopeFMMainActivity extends AppCompatActivity implements View.OnClic
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         audioButton = (Button) findViewById(R.id.audio_controls);
+        wwwButton = (Button) findViewById(R.id.www);
+        wwwButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Creating the instance of PopupMenu
+                PopupMenu popup = new PopupMenu(HopeFMMainActivity.this, wwwButton);
+                //Inflating the Popup using xml file
+                popup.getMenuInflater()
+                        .inflate(R.menu.www_popup, popup.getMenu());
+
+                //registering popup with OnMenuItemClickListener
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    public boolean onMenuItemClick(MenuItem item) {
+                        String url = null;
+                        switch (item.getItemId()) {
+                            case R.id.website:
+                                url = getString(R.string.website_url);
+                                break;
+                            case R.id.fb:
+                                url = getString(R.string.fb_url);
+                                break;
+                            case R.id.vk:
+                                url = getString(R.string.vk_url);
+                                break;
+                            case R.id.twitter:
+                                url = getString(R.string.twitter_url);
+                                break;
+                            case R.id.write_us:
+                                url = getString(R.string.mailto_url);
+                                break;
+                            default:
+                                break;
+                        }
+                        if (url != null) {
+                            Intent intent = new Intent(android.content.Intent.ACTION_VIEW);
+                            intent.setData(Uri.parse(url));
+                            if (item.getItemId() == R.id.write_us) {
+                                intent.putExtra("android.intent.extra.SUBJECT", "\"" + getString(R.string.app_name) + "\" Android");
+                            }
+                            if (intent.resolveActivity(getPackageManager()) != null) {
+                                startActivity(intent);
+                            }
+                        }
+
+                        return true;
+                    }
+                });
+                popup.show(); //showing popup menu
+            }
+        });
         playButton = (ImageButton) findViewById(R.id.buttonPlayPause);
         playButton.setOnClickListener(this);
         statusText = (TextView) findViewById(R.id.textStatus);
@@ -49,6 +102,8 @@ public class HopeFMMainActivity extends AppCompatActivity implements View.OnClic
         songNameText.setText("");
         artistNameText = (TextView) findViewById(R.id.textArtistName);
         artistNameText.setText("");
+        TextView hopeFMText = (TextView) findViewById(R.id.hopeFMText);
+        hopeFMText.setText(Html.fromHtml(getString(R.string.hopefm)));
         mPopupMenu = new PopupMenu(this, audioButton);
         mPopupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
@@ -60,6 +115,7 @@ public class HopeFMMainActivity extends AppCompatActivity implements View.OnClic
                 return false;
             }
         });
+
     }
 
     @Override
@@ -183,9 +239,11 @@ public class HopeFMMainActivity extends AppCompatActivity implements View.OnClic
                     break;
                 case STATUS_MSG:
                     String status = msg.getData().getString("status");
+                    String localizedStatus = "";
                     if ("error".equals(status)) {
                         mHopeFMService.stop();
                         setOnPauseButtons();
+                        localizedStatus = getString(R.string.status_error);
                     }
                     if ("stopped".equals(status)) {
                         setOnPauseButtons();
@@ -195,7 +253,13 @@ public class HopeFMMainActivity extends AppCompatActivity implements View.OnClic
                         setOnPlayButtons();
                         break;
                     }
-                    statusText.setText(status);
+                    if ("buffering".equals(status)) {
+                        localizedStatus = getString(R.string.status_buffering);
+                    }
+                    if ("preparing".equals(status)) {
+                        localizedStatus = getString(R.string.status_preparing);
+                    }
+                    statusText.setText(localizedStatus);
                     break;
                 case TRACKS_MSG:
                     ArrayList<String> tracks = msg.getData().getStringArrayList("tracks");
