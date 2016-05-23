@@ -25,7 +25,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="Радіо"
+            android:text="@string/radio_capture"
             android:textAllCaps="true"
             android:textSize="20sp" />
 
@@ -88,7 +88,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="20dp"
             android:gravity="center"
-            android:text="© 2016 Hope Media Group Ukraine"
+            android:text="@string/copyright_capture"
             android:textColor="@color/colorAccent" />
     </LinearLayout>
 </LinearLayout>

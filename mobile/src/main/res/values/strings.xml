@@ -1,0 +1,18 @@
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">Hope.FM</string>
+    <string name="radio_stream_url" translatable="false">http://stream.hope.ua:1935/hopefm/ngrp:live/playlist.m3u8</string>
+    <string name="radio_info_url" translatable="false">http://stream.hope.ua:7777/currentsong?sid=21</string>
+
+    <string name="audio">Audio</string>
+
+    <string name="error_drm_not_supported" translatable="false">Protected content not supported on API levels below 18</string>
+    <string name="error_drm_unsupported_scheme" translatable="false">This device does not support the required DRM scheme</string>
+    <string name="error_drm_unknown" translatable="false">An unknown DRM error occurred</string>
+    <string name="error_no_decoder" translatable="false">This device does not provide a decoder for <xliff:g id="mime_type">%1$s</xliff:g></string>
+    <string name="error_no_secure_decoder" translatable="false">This device does not provide a secure decoder for <xliff:g id="mime_type">%1$s</xliff:g></string>
+    <string name="error_querying_decoders" translatable="false">Unable to query device decoders</string>
+    <string name="error_instantiating_decoder" translatable="false">Unable to instantiate decoder <xliff:g id="decoder_name">%1$s</xliff:g></string>
+    <string name="storage_permission_denied" translatable="false">Permission to access storage was denied</string>
+    <string name="copyright_capture">© 2016 Hope Media Group UA</string>
+    <string name="radio_capture">Radio</string>
+</resources>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Hope.FM</string>
+    <string name="radio_capture">Радіо</string>
+    <string name="copyright_capture">© 2016 Медіа Група «Надія»</string>
+    <string name="audio">Аудіо</string>
+</resources>
