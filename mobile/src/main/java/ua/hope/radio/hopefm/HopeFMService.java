@@ -103,11 +103,10 @@ public class HopeFMService extends Service implements HopeFMPlayer.Listener, Hop
         mNotifyManager = NotificationManagerCompat.from(this);
         Intent notificationIntent = new Intent(this, HopeFMMainActivity.class);
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
 
         PendingIntent stopPendingIntent = PendingIntent.getService(this, 0,
-                new Intent(this, HopeFMService.class).setAction("stop"), PendingIntent.FLAG_UPDATE_CURRENT);
+                new Intent(this, HopeFMService.class).setAction("stop"), 0);
         RemoteViews views = new RemoteViews(getPackageName(), R.layout.status_bar);
         views.setOnClickPendingIntent(R.id.status_bar_stop, stopPendingIntent);
         mServiceNotification = new NotificationCompat.Builder(this)
@@ -118,7 +117,7 @@ public class HopeFMService extends Service implements HopeFMPlayer.Listener, Hop
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if ("stop".equals(intent.getAction())) {
+        if (intent != null && "stop".equals(intent.getAction())) {
             stop();
         }
         return super.onStartCommand(intent, flags, startId);
