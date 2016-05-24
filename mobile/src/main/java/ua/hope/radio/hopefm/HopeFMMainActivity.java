@@ -37,7 +37,7 @@ public class HopeFMMainActivity extends AppCompatActivity implements View.OnClic
     private TextView artistNameText;
 
     private IHopeFMService mHopeFMService;
-    boolean mBound = false;
+    private boolean mBound = false;
     private PopupMenu mPopupMenu;
 
     @Override
@@ -123,7 +123,7 @@ public class HopeFMMainActivity extends AppCompatActivity implements View.OnClic
         super.onStart();
         Intent intent = new Intent(this, HopeFMService.class);
         startService(intent);
-        if (mHopeFMService == null) {
+        if (mHopeFMService == null || !mBound) {
             bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
         }
     }

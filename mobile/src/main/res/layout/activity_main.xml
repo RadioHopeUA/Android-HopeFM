@@ -44,6 +44,7 @@
             android:id="@+id/textSongName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:gravity="center"
             android:text="Song name"
             android:textAllCaps="true"
             android:textColor="@color/colorAccent"
@@ -54,6 +55,7 @@
             android:id="@+id/textArtistName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:gravity="center"
             android:text="Artist name"
             android:textColor="@color/colorAccent"
             android:textSize="24sp" />
