@@ -13,5 +13,8 @@
     <string name="vkontakte">Вконтакте</string>
     <string name="web_page">Веб страница</string>
     <string name="write_us">Обратная связь</string>
+    <string name="audio_auto">Автоматично</string>
+    <string name="audio_kbits">%.0fКбит</string>
+    <string name="audio_unknown">неизвестно</string>
     <string name="facebook">Фейсбук</string>
 </resources>

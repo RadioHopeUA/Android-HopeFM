@@ -12,7 +12,6 @@ import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
-import android.text.TextUtils;
 import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.Toast;
@@ -29,7 +28,6 @@ import com.google.android.exoplayer.metadata.id3.GeobFrame;
 import com.google.android.exoplayer.metadata.id3.Id3Frame;
 import com.google.android.exoplayer.metadata.id3.PrivFrame;
 import com.google.android.exoplayer.metadata.id3.TxxxFrame;
-import com.google.android.exoplayer.util.MimeTypes;
 import com.google.android.exoplayer.util.Util;
 
 import java.util.ArrayList;
@@ -350,51 +348,18 @@ public class HopeFMService extends Service implements HopeFMPlayer.Listener, Hop
         }
     }
 
-    private static String buildTrackName(MediaFormat format) {
+    private String buildTrackName(MediaFormat format) {
         if (format.adaptive) {
-            return "auto";
+            return getString(R.string.audio_auto);
         }
-        String trackName;
-        if (MimeTypes.isVideo(format.mimeType)) {
-            trackName = joinWithSeparator(joinWithSeparator(buildResolutionString(format),
-                    buildBitrateString(format)), buildTrackIdString(format));
-        } else if (MimeTypes.isAudio(format.mimeType)) {
-            trackName = joinWithSeparator(joinWithSeparator(joinWithSeparator(buildLanguageString(format),
-                    buildAudioPropertyString(format)), buildBitrateString(format)),
-                    buildTrackIdString(format));
-        } else {
-            trackName = joinWithSeparator(joinWithSeparator(buildLanguageString(format),
-                    buildBitrateString(format)), buildTrackIdString(format));
-        }
-        return trackName.length() == 0 ? "unknown" : trackName;
+        String trackName = buildBitrateString(format);
+
+        return trackName.length() == 0 ? getString(R.string.audio_unknown) : trackName;
     }
 
-    private static String buildResolutionString(MediaFormat format) {
-        return format.width == MediaFormat.NO_VALUE || format.height == MediaFormat.NO_VALUE
-                ? "" : format.width + "x" + format.height;
-    }
-
-    private static String buildAudioPropertyString(MediaFormat format) {
-        return format.channelCount == MediaFormat.NO_VALUE || format.sampleRate == MediaFormat.NO_VALUE
-                ? "" : format.channelCount + "ch, " + format.sampleRate + "Hz";
-    }
-
-    private static String buildLanguageString(MediaFormat format) {
-        return TextUtils.isEmpty(format.language) || "und".equals(format.language) ? ""
-                : format.language;
-    }
-
-    private static String buildBitrateString(MediaFormat format) {
+    private String buildBitrateString(MediaFormat format) {
         return format.bitrate == MediaFormat.NO_VALUE ? ""
-                : String.format(Locale.US, "%.2fMbit", format.bitrate / 1000000f);
-    }
-
-    private static String joinWithSeparator(String first, String second) {
-        return first.length() == 0 ? second : (second.length() == 0 ? first : first + ", " + second);
-    }
-
-    private static String buildTrackIdString(MediaFormat format) {
-        return format.trackId == null ? "" : " (" + format.trackId + ")";
+                : String.format(Locale.US, getString(R.string.audio_kbits), format.bitrate / 1000f);
     }
 
     private boolean stoppedByAudioFocus = false;

@@ -9,6 +9,9 @@
     <string name="mailto_url" translatable="false">mailto:chernyak.vitaliy@gmail.com</string>
 
     <string name="audio">Audio</string>
+    <string name="audio_kbits">%.0fKbit</string>
+    <string name="audio_unknown">unknown</string>
+    <string name="audio_auto">auto</string>
 
     <string name="error_drm_not_supported" translatable="false">Protected content not supported on API levels below 18</string>
     <string name="error_drm_unsupported_scheme" translatable="false">This device does not support the required DRM scheme</string>
