@@ -6,7 +6,7 @@
     <string name="fb_url" translatable="false">https://www.facebook.com/golosnadii</string>
     <string name="twitter_url" translatable="false">https://twitter.com/golosnadii</string>
     <string name="vk_url" translatable="false">https://vk.com/golosnadii</string>
-    <string name="mailto_url" translatable="false">mailto:chernyak.vitaliy@gmail.com</string>
+    <string name="mailto_url" translatable="false">mailto:radio@hope.ua</string>
 
     <string name="audio">Audio</string>
     <string name="audio_kbits">%.0fKbit</string>
