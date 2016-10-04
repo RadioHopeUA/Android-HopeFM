@@ -9,7 +9,6 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="40dp"
         android:background="@color/colorPrimaryDark"
         android:padding="10dp">
 
@@ -40,12 +39,21 @@
         android:gravity="center"
         android:orientation="vertical">
 
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
         <TextView
             android:id="@+id/textSongName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
             android:gravity="center"
             android:text="Song name"
+            android:maxLines="2"
+            android:ellipsize="end"
             android:textAllCaps="true"
             android:textColor="@color/colorAccent"
             android:textSize="24sp"
@@ -55,16 +63,24 @@
             android:id="@+id/textArtistName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
             android:gravity="center"
             android:text="Artist name"
+            android:maxLines="1"
+            android:ellipsize="end"
             android:textColor="@color/colorAccent"
             android:textSize="24sp" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
 
         <ImageButton
             android:id="@+id/buttonPlayPause"
             android:layout_width="96dp"
             android:layout_height="96dp"
-            android:layout_marginTop="50dp"
             android:adjustViewBounds="true"
             android:background="#00000000"
             android:scaleType="fitXY"
