@@ -134,7 +134,9 @@ public class HopeFMService extends Service implements HopeFMPlayer.Listener, Hop
     }
 
     private void stopTrackInfoScheduler() {
-        mScheduledTask.cancel(true);
+        if (mScheduledTask != null) {
+            mScheduledTask.cancel(true);
+        }
         exec.remove(updateTrackRunnable);
         exec.purge();
     }
