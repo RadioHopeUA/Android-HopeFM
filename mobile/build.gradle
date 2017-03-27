@@ -1,15 +1,15 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 24
-    buildToolsVersion "24.0.3"
+    compileSdkVersion 25
+    buildToolsVersion "25.0.2"
 
     defaultConfig {
         applicationId "ua.hope.radio.hopefm"
         minSdkVersion 16
-        targetSdkVersion 24
-        versionCode 6
-        versionName "1.0.5"
+        targetSdkVersion 25
+        versionCode 7
+        versionName "1.0.6"
         vectorDrawables.useSupportLibrary = true
     }
 
@@ -60,7 +60,7 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:24.2.1'
-    compile 'com.google.android.exoplayer:exoplayer:r1.5.11'
-    compile 'com.squareup.okhttp3:okhttp:3.4.1'
+    compile 'com.android.support:appcompat-v7:25.3.0'
+    compile 'com.google.android.exoplayer:exoplayer:r1.5.15'
+    compile 'com.squareup.okhttp3:okhttp:3.6.0'
 }
